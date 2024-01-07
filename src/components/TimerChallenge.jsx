@@ -5,21 +5,22 @@ export default function TimerChallenge({ title, targetTime }) {
 	const timer = useRef()
 	const dialog = useRef()
 
-	const [timeRemaining, seTimeRemaining] = useState(targetTime * 1000)
+	const [timeRemaining, setTimeRemaining] = useState(targetTime * 1000)
 
-	let timerIsActive = timeRemaining > 0 && timeRemaining < targetTime * 1000
+	const timerIsActive = timeRemaining > 0 && timeRemaining < targetTime * 1000
 
 	if (timeRemaining <= 0) {
 		clearInterval(timer.current)
 		dialog.current.open()
-		seTimeRemaining(targetTime * 1000)
 	}
-	
+	function handleReset() {
+		clearInterval(timer.current)
+		setTimeRemaining(targetTime * 1000)
+	}
+
 	function handleStart() {
 		timer.current = setInterval(() => {
-			seTimeRemaining(prevTimeRemaining => {
-				prevTimeRemaining - 10
-			})
+			setTimeRemaining(prevTimeRemaining => prevTimeRemaining - 10)
 		}, 10)
 	}
 
@@ -30,10 +31,9 @@ export default function TimerChallenge({ title, targetTime }) {
 
 	return (
 		<>
-			<ResultModal ref={dialog} targetTime={targetTime} result={'lost'} />
+			<ResultModal ref={dialog} targetTime={targetTime} result={timeRemaining} resetTime={handleReset} />
 			<section className="challenge">
 				<h2>{title}</h2>
-				{timerExpierd && <p>You lost</p>}
 				<p className="challenge-time">
 					{targetTime} second{targetTime > 1 ? 's' : ''}
 				</p>
